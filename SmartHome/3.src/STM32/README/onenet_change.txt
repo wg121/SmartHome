@@ -1,0 +1,27 @@
+switch(qos)
+				{
+					case 1:															//收到publish的qos为1，设备需要回复Ack
+					
+						if(MQTT_PacketPublishAck(pkt_id, &mqttPacket) == 0)
+						{
+							UsartPrintf(USART_DEBUG, "Tips:	Send PublishAck\r\n");
+							ESP8266_SendData(mqttPacket._data, mqttPacket._len);
+							MQTT_DeleteBuffer(&mqttPacket);
+						}
+					
+					break;
+					
+					case 2:															//收到publish的qos为2，设备先回复Rec
+																					//平台回复Rel，设备再回复Comp
+						if(MQTT_PacketPublishRec(pkt_id, &mqttPacket) == 0)
+						{
+							UsartPrintf(USART_DEBUG, "Tips:	Send PublishRec\r\n");
+							ESP8266_SendData(mqttPacket._data, mqttPacket._len);
+							MQTT_DeleteBuffer(&mqttPacket);
+						}
+					
+					break;
+					
+					default:
+						break;
+				}
